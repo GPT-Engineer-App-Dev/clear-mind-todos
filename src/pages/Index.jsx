@@ -1,17 +1,75 @@
-// Update this page (the content is just a fallback if you fail and example)
-// Use chakra-ui
-import { Container, Text, VStack } from "@chakra-ui/react";
-
-// Example of using react-icons
-// import { FaRocket } from "react-icons/fa";
-// <IconButton aria-label="Add" icon={<FaRocket />} size="lg" />; // IconButton would also have to be imported from chakra
+import { useState } from 'react';
+import {
+  Container,
+  VStack,
+  HStack,
+  Input,
+  Button,
+  Checkbox,
+  Text,
+  IconButton,
+  Box
+} from '@chakra-ui/react';
+import { FaTrash } from 'react-icons/fa';
 
 const Index = () => {
+  const [tasks, setTasks] = useState([]);
+  const [inputValue, setInputValue] = useState('');
+
+  const addTask = () => {
+    if (inputValue.trim() === '') return;
+    setTasks([...tasks, { text: inputValue, completed: false }]);
+    setInputValue('');
+  };
+
+  const toggleTaskCompletion = (index) => {
+    const newTasks = tasks.map((task, i) => (
+      i === index ? { ...task, completed: !task.completed } : task
+    ));
+    setTasks(newTasks);
+  };
+
+  const deleteTask = (index) => {
+    const newTasks = tasks.filter((_, i) => i !== index);
+    setTasks(newTasks);
+  };
+
   return (
-    <Container centerContent maxW="container.md" height="100vh" display="flex" flexDirection="column" justifyContent="center" alignItems="center">
-      <VStack spacing={4}>
-        <Text fontSize="2xl">Your Blank Canvas</Text>
-        <Text>Chat with the agent to start making edits.</Text>
+    <Container
+      centerContent
+      maxW="container.md"
+      p={4}
+      height="100vh"
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <VStack spacing={4} width="100%">
+        <HStack width="100%">
+          <Input
+            variant="filled"
+            placeholder="Add a new task..."
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+          />
+          <Button onClick={addTask} colorScheme="teal">Add</Button>
+        </HStack>
+        <VStack spacing={2} width="100%">
+          {tasks.map((task, index) => (
+            <HStack key={index} width="100%" p={2} bg="gray.100" borderRadius="md" justifyContent="space-between">
+              <Checkbox isChecked={task.completed} onChange={() => toggleTaskCompletion(index)}>
+                <Text as={task.completed ? 'del' : ''}>{task.text}</Text>
+              </Checkbox>
+              <IconButton
+                aria-label="Delete task"
+                icon={<FaTrash />}
+                size="sm"
+                onClick={() => deleteTask(index)}
+              />
+            </HStack>
+          ))}
+        </VStack>
       </VStack>
     </Container>
   );
